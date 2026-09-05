@@ -80,7 +80,7 @@ const logout = async (req, res) => {
         const isProduction = process.env.NODE_ENV === "production"
         res.clearCookie("token", {
             path: "/",
-            samesite: lax,
+            samesite: "lax",
             security: isProduction
         })
         res.status(200).json({
