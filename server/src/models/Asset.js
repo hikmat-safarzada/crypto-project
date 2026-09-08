@@ -13,6 +13,9 @@ const assetSchema = mongoose.Schema({
         type: String,
         enum: ["crypto", "stock"],
         required: true
+    },
+    coinGeckoId: {
+        type: String 
     }
 }, {
     timestamps: true

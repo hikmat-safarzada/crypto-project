@@ -3,7 +3,7 @@ const {config} = require("../config/config")
 const verifyToken = async (req, res, next) => {
     try {
         if(req.method === "OPTIONS"){
-            next();
+            return next();
         }
         const token = req.cookies?.token
         if(!token){

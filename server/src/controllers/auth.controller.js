@@ -1,12 +1,13 @@
 const User = require("../models/User")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const { config } = require("../config/config")
 const register = async (req, res) => {
     try {
         const { name, email, password } = req.body
         const existUser = await User.findOne({ email })
         if (existUser) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "User already exists"
             })
         }
@@ -48,14 +49,14 @@ const login = async (req, res) => {
         }
         const token = jwt.sign(
             { id: user._id },
-            process.env.JWT_SECRET,
+            config.jwt_secret,
             { expiresIn: "15d" }
         )
         const isProduction = process.env.NODE_ENV === "production";
         res.cookie("token", token, {
             httpOnly: true,
             secure: isProduction,
-            samesite: "lax",
+            sameSite: "lax",
             maxAge: 15 * 24 * 60 * 60 * 1000,
             path: "/"
         })
@@ -80,8 +81,8 @@ const logout = async (req, res) => {
         const isProduction = process.env.NODE_ENV === "production"
         res.clearCookie("token", {
             path: "/",
-            samesite: "lax",
-            security: isProduction
+            sameSite: "lax",
+            secure: isProduction
         })
         res.status(200).json({
             message: "Logged out successfully!"
