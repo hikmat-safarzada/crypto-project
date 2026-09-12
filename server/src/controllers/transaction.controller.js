@@ -1,4 +1,4 @@
-const {executeTransaction} = require("../services/transaction.service")
+const {executeTransaction, getUserTransactionHistory} = require("../services/transaction.service")
 const buyAsset = async (req, res) => {
     try {
         const {symbol, quantity} = req.body;
@@ -35,4 +35,18 @@ const sellAsset = async (req, res) => {
     }
 }
 
-module.exports = {buyAsset, sellAsset}
+const getHistory = async (req, res) => {
+    try {
+        const userId = req.user.id
+        const history = await getUserTransactionHistory(userId);
+        res.status(200).json({
+            transactions: history
+        })
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message
+        })
+    }
+}
+
+module.exports = {buyAsset, sellAsset, getHistory}

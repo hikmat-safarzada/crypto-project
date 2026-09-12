@@ -1,7 +1,7 @@
 const Asset = require("../models/Asset")
 const User = require("../models/User")
 const Transaction = require("../models/Transaction")
-const {getCryptoPrice} = require("./price.service")
+const {getAssetPrice} = require("./price.service")
 const { getUserHoldingQuantity } = require("./holding.service")
 const executeTransaction = async({userId, symbol, quantity, type}) => {
     try {
@@ -10,7 +10,7 @@ const executeTransaction = async({userId, symbol, quantity, type}) => {
             throw new Error(`${symbol} hasn't found` );
         }
 
-        const price = await getCryptoPrice(asset.symbol)
+        const price = await getAssetPrice(asset)
         const totalPrice = price * quantity;
 
         const user = await User.findById(userId);
@@ -23,7 +23,7 @@ const executeTransaction = async({userId, symbol, quantity, type}) => {
             }
             user.balance -= totalPrice
         } else if(type == "sell"){
-            const currentHolding = await getUserHoldingQuantity(userId, asset._id)
+            const currentHolding = await getUserHoldingQuantity({userId, assetId: asset._id})
             if(currentHolding < quantity){
                 throw new Error(`Not enough quantity`);
             }
@@ -46,4 +46,19 @@ const executeTransaction = async({userId, symbol, quantity, type}) => {
     }
 }
 
-module.exports = {executeTransaction}
+const getUserTransactionHistory = async (userId) => {
+    const transactions = await Transaction.find({user: userId}).populate("asset").sort({createdAt: -1})
+
+    return transactions.map((tx) => ({
+        id: tx._id,
+        symbol: tx.asset.symbol,
+        name: tx.asset.name,
+        quantity: tx.quantity,
+        type: tx.asset.type,
+        priceAtTransaction: tx.priceAtTransaction,
+        totalValue: tx.quantity * tx.priceAtTransaction,
+        date: tx.createdAt
+    }))
+}
+
+module.exports = {executeTransaction, getUserTransactionHistory}
