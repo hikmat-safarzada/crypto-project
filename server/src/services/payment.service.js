@@ -6,7 +6,7 @@ const { config } = require("../config/config")
 
 const stripe = new Stripe(config.stripe_secret);
 const createCheckOutSession = async (userId, amount) => {
-    if (!amount || amount < 0) {
+    if (!amount || amount <= 0) {
         throw new Error("Invalid amount");
     }
     const session = await stripe.checkout.sessions.create({
@@ -60,9 +60,10 @@ const handlerStripeWebHook = async (rawBody, signature) => {
         }
         payment.status = "completed";
         await payment.save();
-        const user = User.findOne(payment.user)
+        const user = await User.findOne(payment.user)
         user.balance += payment.amount;
         await user.save();
+        console.log(payment)
         console.log("NEW BALANCE:", user.balance);
     }
 }

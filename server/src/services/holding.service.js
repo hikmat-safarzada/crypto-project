@@ -49,7 +49,7 @@ const getUserHoldings = async (userId) => {
                 type: transact.asset.type
             }
         }
-        holdingsMap[symbol].quantity += type === "buy" ? transact.quantity : -transact.quantity
+        holdingsMap[symbol].quantity += transact.type === "buy" ? transact.quantity : -transact.quantity
     })
     return Object.values(holdingsMap).filter(h => h.quantity > 0)
 }

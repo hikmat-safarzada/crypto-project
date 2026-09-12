@@ -54,7 +54,7 @@ const getUserTransactionHistory = async (userId) => {
         symbol: tx.asset.symbol,
         name: tx.asset.name,
         quantity: tx.quantity,
-        type: tx.asset.type,
+        type: tx.type,
         priceAtTransaction: tx.priceAtTransaction,
         totalValue: tx.quantity * tx.priceAtTransaction,
         date: tx.createdAt
